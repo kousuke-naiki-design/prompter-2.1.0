@@ -67,7 +67,7 @@
             const sceneDescriptions = {
                 '都心の街並み': '東京の表参道のような洗練された都市の歩道。地面は清潔なグレーの石畳。背景にはモダンなガラス張りのビルと、整然と並ぶケヤキの街路樹。微かに高級車が路駐している清潔感のある都会の風景。',
                 'おしゃれなカフェ前': 'ヴィンテージレンガの壁面が特徴的なカフェの入り口。黒いアイアンのテラス席と木製のテーブル。入り口横には大きなオリーブの鉢植え。落ち着いたヨーロッパ風の路地裏。',
-                'コンクリート': '打ち放しコンクリートの壁が印象的な、モダンでミニマルな建築の外壁。規則的なセパレーターの跡が並ぶグレーの壁面が、人物のシルエットを際立たせる背景となっている。地面はフラットなコンクリートで、無機質で洗練された都市の片隅を演出している。',
+                'コンクリート': '打ち放しコンクリートの壁が印象的な、モダンでミニマルな建築の外壁。規則的なセパレーターの跡が並ぶグレーの壁面が, 人物のシルエットを際立たせる背景となっている。地面はフラットなコンクリートで, 無機質で洗練された都市の片隅を演出している。',
                 '自然豊かな公園': '手入れの行き届いた芝生が広がる開放的な公園。背景には深い緑の落葉樹の森。小道はベージュの砂利。木漏れ日が地面に水玉模様を作っている、穏やかで明るい自然光に包まれた場所。',
                 'モダンなオフィス': 'ミニマルでモダンなオフィス空間。背景には黒いスチールフレームのガラスパーティションが整然と並び、空間に奥行きと構造的な美しさを与えている。木製のデスクやオフィスチェアが配置されたワークスペースは、機能的でありながら温かみのある北欧デザインを彷彿とさせる。',
                 'ホテルのロビー': '高い天井と大理石の床が煌びやかな高級ホテルのロビー。背景には暖色の間接照明と、ベルベット素材の重厚なソファ。ラグジュアリーで静寂な空気感が漂う空間。',
@@ -120,6 +120,7 @@
             const studioDropdownRef = useRef(null);
             const colorPickerRef = useRef(null);
             const fileInputRef = useRef(null);
+            const promptTextareaRef = useRef(null);
 
             useEffect(() => {
                 const handleClickOutside = (event) => {
@@ -130,6 +131,14 @@
                 document.addEventListener('mousedown', handleClickOutside);
                 return () => document.removeEventListener('mousedown', handleClickOutside);
             }, []);
+
+            // プロンプトエリアの高さ自動調整
+            useEffect(() => {
+                if (promptTextareaRef.current) {
+                    promptTextareaRef.current.style.height = 'auto';
+                    promptTextareaRef.current.style.height = promptTextareaRef.current.scrollHeight + 'px';
+                }
+            }, [generatedPrompt]);
 
             const handleChipClick = (key, val) => {
                 if (key === 'scene') {
@@ -152,11 +161,10 @@
             const applyStudioColor = (hex) => {
                 const cleanHex = hex.startsWith('#') ? hex : `#${hex}`;
                 setStudioColor(cleanHex);
-                const desc = `完全に均一な単色の撮影スタジオ背景。背景色はWEBカラーコード「${cleanHex}」を厳密に再現すること。装飾を一切排除した無機質な空間で、影の出にくい柔らかな照明が全体に回り、商品の色味と質感を最も正確に伝えるプロ仕様の撮影環境。`;
+                const desc = `完全に均一な単色の撮影スタジオ背景。背景色はWEBカラーコード「${cleanHex}」を厳密に再現すること。装飾を一切排除した無機質な空間で, 影の出にくい柔らかな照明が全体に回り, 商品の色味と質感を最も正確に伝えるプロ仕様の撮影環境。`;
                 setEditableValues(prev => ({ ...prev, scene: desc }));
             };
 
-            // スポイト機能
             const pickColorFromImage = async () => {
                 if (!window.EyeDropper) {
                     alert("お使いのブラウザはスポイト機能をサポートしていません（最新のChrome, Edge等で動作します）。");
@@ -166,8 +174,8 @@
                 try {
                     const result = await eyeDropper.open();
                     applyStudioColor(result.sRGBHex);
-                    setIsModalOpen(false); // モーダルを閉じる
-                    setIsStudioOpen(true);  // スタジオメニューを再度開く（または維持）
+                    setIsModalOpen(false); 
+                    setIsStudioOpen(true);
                 } catch (e) {
                     console.log("Color picking cancelled");
                 }
@@ -180,7 +188,6 @@
                     reader.onload = (event) => {
                         setUploadedImg(event.target.result);
                         setIsModalOpen(true); 
-                        // 画像読み込み完了後に自動でスポイトを起動
                         setTimeout(() => {
                             pickColorFromImage();
                         }, 300);
@@ -201,12 +208,16 @@
                 const displayProduct = productInfo.trim() || 'メインイメージに映っている商品の色、素材の質感、ディテールをそのまま維持する';
                 const displaySize = sizeInfo.trim() || 'メインイメージにある衣服の形状、丈感、シルエット、ボリューム感を忠実に再現し、過度な形状補正を行わない';
                 const displayCoord = coordinateInfo.trim() || 'メインイメージのスタイリングを尊重し、シンプルで調和の取れた構成にする';
-                const angleStyle = editableValues.angle === '全身（顔切り）' ? '全身のポートレートだが、首から上の顔部分はフレームアウト（カット）させ、商品とスタイルに焦点を当てること。' : editableValues.angle;
+                const angleStyle = editableValues.angle === '全身（顔切り）' ? '全身のポートレートだが, 首から上の顔部分はフレームアウト（カット）させ, 商品とスタイルに焦点を当てること。' : editableValues.angle;
                 const refLines = Object.entries(refComments).filter(([_, val]) => val.trim() !== '').map(([key, val]) => `${key.replace('slot', '参考画像')}: ${val}`);
                 const displayRefs = refLines.length > 0 ? `【参考画像への個別指示】\n${refLines.join('\n')}` : `【参考画像への指示】\nアップロードされた各参考画像から、ポーズ・顔立ち・背景のニュアンスを総合的に抽出し、反映する`;
 
                 const prompt = `LOOK写真構成：\n【アングル】${angleStyle}\n【モデル】${editableValues.modelAge}、${editableValues.modelType}な${editableValues.modelEthnicity}の${editableValues.modelGender}。${editableValues.modelVibe}な雰囲気。\n\n【商品詳細】\n${displayProduct}\n\n【サイズ感・シルエット】\n${displaySize}\n\n【コーディネート】\n${displayCoord}\n\n【ロケーション詳細】\n${editableValues.scene}\n\n【ライティング・動作】\n${editableValues.lighting}のなか、${editableValues.pose}。\n\n${displayRefs}\n\n【撮影クオリティ】\n${editableValues.camera}。高解像度、2K、フォトリアル、商用カタログ品質、衣類の質感を正確に描写。不自然なロゴや文字は含めない。メインイメージにある服の固有のキャラクターを損なわないこと。`;
                 setGeneratedPrompt(prompt);
+            };
+
+            const handlePromptEdit = (e) => {
+                setGeneratedPrompt(e.target.value);
             };
 
             useEffect(() => { generate(); }, [editableValues, productInfo, sizeInfo, coordinateInfo, refComments]);
@@ -237,7 +248,7 @@
                             <p className="text-slate-500 mt-2 text-sm font-bold italic tracking-wide">High Consistency Lookbook Generator</p>
                         </header>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                             <div className="lg:col-span-7 space-y-6">
                                 <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-[#18ABA0]/10">
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-3 text-slate-700">
@@ -347,8 +358,8 @@
                                 </section>
                             </div>
 
-                            <div className="lg:col-span-5 space-y-6">
-                                <section className="bg-slate-900 text-slate-100 p-6 rounded-3xl shadow-2xl sticky top-8 border border-slate-700">
+                            <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8">
+                                <section className="bg-slate-900 text-slate-100 p-6 rounded-3xl shadow-2xl border border-slate-700">
                                     <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-4">
                                         <div>
                                             <h2 className="text-lg font-bold flex items-center gap-2 text-[#18ABA0]"><Icon name="refresh-cw" size={20} />コピー用 指示テキスト</h2>
@@ -363,9 +374,16 @@
                                             <Icon name={copied ? "check-circle-2" : "copy"} size={16} /> {copied ? 'コピー成功' : 'コピーする'}
                                         </button>
                                     </div>
-                                    <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 min-h-[400px] whitespace-pre-wrap text-[12px] leading-relaxed font-bold font-mono text-slate-300">
-                                        {generatedPrompt}
-                                    </div>
+                                    {/* 全表示UIへの修正: min-hを維持しつつ、内容に合わせて自動で伸びる設定 */}
+                                    <textarea 
+                                        ref={promptTextareaRef}
+                                        className="w-full bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 text-[12px] leading-relaxed font-bold font-mono text-slate-300 focus:ring-2 focus:ring-[#18ABA0] focus:outline-none transition-all resize-none overflow-hidden"
+                                        value={generatedPrompt}
+                                        onChange={handlePromptEdit}
+                                        spellCheck="false"
+                                        rows="1"
+                                    />
+                                    <p className="mt-4 text-[10px] text-slate-500 text-center font-bold">↑ 修正を加えると高さが自動で調整されます</p>
                                 </section>
                             </div>
                         </div>
@@ -403,7 +421,7 @@
                         )}
 
                         <footer className="mt-12 py-8 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold">
-                            AI Fashion Image Generator Logic v4.2 | Button Label Fixed
+                            AI Fashion Image Generator Logic v4.4 | Auto-resize Textarea UI
                         </footer>
                     </div>
                 </div>
