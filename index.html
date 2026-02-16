@@ -1,417 +1,349 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Copy, RefreshCw, Info, Image as ImageIcon, User, MapPin, Camera, Sparkles, CheckCircle2, Layout, Edit3, ShoppingBag, ListChecks, Type, ChevronDown } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EC AI Prompt Master Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div id="root"></div>
 
-const App = () => {
-  // 詳細な背景描写の定義
-  const sceneDescriptions = {
-    '都心の街並み': '東京の表参道のような洗練された都市の歩道。地面は清潔なグレーの石畳。背景にはモダンなガラス張りのビルと、整然と並ぶケヤキの街路樹。微かに高級車が路駐している清潔感のある都会の風景。',
-    'おしゃれなカフェ前': 'ヴィンテージレンガの壁面が特徴的なカフェの入り口。黒いアイアンのテラス席と木製のテーブル。入り口横には大きなオリーブの鉢植え。落ち着いたヨーロッパ風の路地裏。',
-    'コンクリート': '打ち放しコンクリートの壁が印象的な、モダンでミニマルな建築の外壁。規則的なセパレーターの跡が並ぶグレーの壁面が、人物のシルエットを際立たせる背景となっている。地面はフラットなコンクリートで、無機質で洗練された都市の片隅を演出している。',
-    '自然豊かな公園': '手入れの行き届いた芝生が広がる開放的な公園。背景には深い緑の落葉樹の森。小道はベージュの砂利。木漏れ日が地面に水玉模様を作っている、穏やかで明るい自然光に包まれた場所。',
-    'モダンなオフィス': 'ミニマルでモダンなオフィス空間。背景には黒いスチールフレームのガラスパーティションが整然と並び、空間に奥行きと構造的な美しさを与えている。木製のデスクやオフィスチェアが配置されたワークスペースは、機能的でありながら温かみのある北欧デザインを彷彿とさせる。',
-    'ホテルのロビー': '高い天井と大理石の床が煌びやかな高級ホテルのロビー。背景には暖色の間接照明と、ベルベット素材の重厚なソファ。ラグジュアリーで静寂な空気感が漂う空間。',
-    'ビーチ・リゾート': '白い砂浜とクリスタルブルーの穏やかな海。背景には数本のヤシの木。空は雲ひとつない快晴。リゾート地のプライベートビーチのような、色彩豊かで開放感溢れるロケーション。'
-  };
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        // Lucideアイコンのラッパーコンポーネント
+        const Icon = ({ name, size = 16, className = "" }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+        };
 
-  // スタジオ詳細バリエーションの定義
-  const studioVariations = {
-    'ホワイトスタジオ（基本）': '完全に均一な白背景の撮影スタジオ。影の出にくい柔らかな照明が全体に回り、商品の色味と質感を最も正確に伝えるカタログスペックの環境。足元まで白いホリゾントが続く。',
-    'グレースタジオ（洗練）': '落ち着いたミディアムグレーのバックペーパーを使用したスタジオ。サイドから強めの光を当て、服の立体感とドレープを際立たせる。都会的で洗練されたルックブック写真の背景。',
-    'ベージュスタジオ（ナチュラル）': '温かみのあるサンドベージュのマットな壁面。リネンやコットンなどの天然素材と相性が良く、オーガニックでリラックスした雰囲気を醸し出す。柔らかなトップライトが全体を包む。',
-    '大きな窓のあるスタジオ': '床から天井まで続く大きな窓がある明るいスタジオ空間。午後の柔らかな自然光が部屋いっぱいに広がり、白やパステルトーンの壁面に反射する。空気感のある、透明度の高いライフスタイル写真。',
-    'アンティークスタジオ': '重厚なダークウッドの床と、彫刻が施されたアンティーク調のモールディング壁。ヴィンテージ家具が一点置かれたクラシックな空間。深みのある暖色のライティングがドラマチックな陰影を作る。',
-    'ロフト風（インダストリアル）': '高い天井と剥き出しの赤いレンガ壁。インダストリアルなアイアンのフレームが窓に見えるロフト風スタジオ。ストリートウェアやカジュアルな着こなしを際立たせる無骨なロケーション。',
-    '大理石調（ラグジュアリー）': '高級感のある白い大理石の壁と、ゴールドのラインが入ったモダンなスタジオ装飾。被写体が鏡面のように床に薄く反射する、ハイエンドなブランドを彷彿とさせるリッチな撮影環境。'
-  };
+        const App = () => {
+            const sceneDescriptions = {
+                '都心の街並み': '東京の表参道のような洗練された都市の歩道。地面は清潔なグレーの石畳。背景にはモダンなガラス張りのビルと、整然と並ぶケヤキの街路樹。微かに高級車が路駐している清潔感のある都会の風景。',
+                'おしゃれなカフェ前': 'ヴィンテージレンガの壁面が特徴的なカフェの入り口。黒いアイアンのテラス席と木製のテーブル。入り口横には大きなオリーブの鉢植え。落ち着いたヨーロッパ風の路地裏。',
+                'コンクリート': '打ち放しコンクリートの壁が印象的な、モダンでミニマルな建築の外壁。規則的なセパレーターの跡が並ぶグレーの壁面が、人物のシルエットを際立たせる背景となっている。地面はフラットなコンクリートで、無機質で洗練された都市の片隅を演出している。',
+                '自然豊かな公園': '手入れの行き届いた芝生が広がる開放的な公園。背景には深い緑の落葉樹の森。小道はベージュの砂利。木漏れ日が地面に水玉模様を作っている、穏やかで明るい自然光に包まれた場所。',
+                'モダンなオフィス': 'ミニマルでモダンなオフィス空間。背景には黒いスチールフレームのガラスパーティションが整然と並び、空間に奥行きと構造的な美しさを与えている。木製のデスクやオフィスチェアが配置されたワークスペースは、機能的でありながら温かみのある北欧デザインを彷彿とさせる。',
+                'ホテルのロビー': '高い天井と大理石の床が煌びやかな高級ホテルのロビー。背景には暖色の間接照明と、ベルベット素材の重厚なソファ。ラグジュアリーで静寂な空気感が漂う空間。',
+                'ビーチ・リゾート': '白い砂浜とクリスタルブルーの穏やかな海。背景には数本のヤシの木。空は雲ひとつない快晴。リゾート地のプライベートビーチのような、色彩豊かで開放感溢れるロケーション。'
+            };
 
-  // オプション定義
-  const options = {
-    modelGender: ['男性', '女性', 'ノンバイナリー'],
-    modelEthnicity: ['日本人', '韓国人系統', '欧米人', 'ハーフ（アジア×欧米）', 'アフリカ系', '南アジア系'],
-    modelAge: ['10代後半', '20代前半', '20代後半', '30代', '40代', '50代以上'],
-    modelType: ['細身', '標準', '筋肉質', 'プラスサイズ', '小柄', '高身長'],
-    modelVibe: ['清潔感・爽やか', 'クール・モード', 'ストリート・無骨', '親しみやすい', 'ラグジュアリー', 'スポーティ', 'ヴィンテージ風'],
-    angle: ['全身', '全身（顔切り）', '上半身（バストアップ）', '膝上（ニーアップ）', '足元・下半身のみ', '背面・バックショット', 'クローズアップ（素材寄り）'],
-    pose: ['正面で立ち', '歩きながら横を向く', 'ポケットに手を入れる', 'スマホを見ている', '椅子に座る', 'バッグを持っている', 'ジャケットを肩にかける'],
-    scene: [...Object.keys(sceneDescriptions), 'スタジオ'],
-    lighting: ['自然光（日中）', '柔らかな逆光', '夕方のゴールデンアワー', 'スタジオ照明（影なし）', 'ドラマチックな影', '曇天（フラットな光）'],
-    camera: ['一眼レフ（背景ボケ）', '全身シャープに撮影', '広角レンズ（パース感）', 'フィルムカメラ風', '35mmポートレート', '真上からの俯瞰'],
-  };
+            const studioVariations = {
+                'ホワイトスタジオ（基本）': '完全に均一な白背景の撮影スタジオ。影の出にくい柔らかな照明が全体に回り、商品の色味と質感を最も正確に伝えるカタログスペックの環境。足元まで白いホリゾントが続く。',
+                'グレースタジオ（洗練）': '落ち着いたミディアムグレーのバックペーパーを使用したスタジオ。サイドから強めの光を当て、服の立体感とドレープを際立たせる。都会的で洗練されたルックブック写真の背景。',
+                'ベージュスタジオ（ナチュラル）': '温かみのあるサンドベージュのマットな壁面。リネンやコットンなどの天然素材と相性が良く、オーガニックでリラックスした雰囲気を醸し出す。柔らかなトップライトが全体を包む。',
+                '大きな窓のあるスタジオ': '床から天井まで続く大きな窓がある明るいスタジオ空間。午後の柔らかな自然光が部屋いっぱいに広がり、白やパステルトーンの壁面に反射する。空気感のある、透明度の高いライフスタイル写真。',
+                'アンティークスタジオ': '重厚なダークウッドの床と、彫刻が施されたアンティーク調のモールディング壁。ヴィンテージ家具が一点置かれたクラシックな空間。深みのある暖色のライティングがドラマチックな陰影を作る。',
+                'ロフト風（インダストリアル）': '高い天井と剥き出しの赤いレンガ壁。インダストリアルなアイアンのフレームが窓に見えるロフト風スタジオ。ストリートウェアやカジュアルな着こなしを際立たせる無骨なロケーション。',
+                '大理石調（ラグジュアリー）': '高級感のある白い大理石の壁と、ゴールドのラインが入ったモダンなスタジオ装飾。被写体が鏡面のように床に薄く反射する、ハイエンドなブランドを彷彿とさせるリッチな撮影環境。'
+            };
 
-  // 表示用ラベル
-  const labels = {
-    modelGender: '性別',
-    modelEthnicity: '国籍・系統',
-    modelAge: '年齢層',
-    modelType: '体格',
-    modelVibe: '雰囲気',
-    angle: 'アングル',
-    pose: 'ポーズ',
-    scene: 'ロケーション（固定背景描写）',
-    lighting: 'ライティング',
-    camera: 'カメラ・画角'
-  };
+            const options = {
+                modelGender: ['男性', '女性', 'ノンバイナリー'],
+                modelEthnicity: ['日本人', '韓国人系統', '欧米人', 'ハーフ（アジア×欧米）', 'アフリカ系', '南アジア系'],
+                modelAge: ['10代後半', '20代前半', '20代後半', '30代', '40代', '50代以上'],
+                modelType: ['細身', '標準', '筋肉質', 'プラスサイズ', '小柄', '高身長'],
+                modelVibe: ['清潔感・爽やか', 'クール・モード', 'ストリート・無骨', '親しみやすい', 'ラグジュアリー', 'スポーティ', 'ヴィンテージ風'],
+                angle: ['全身', '全身（顔切り）', '上半身（バストアップ）', '膝上（ニーアップ）', '足元・下半身のみ', '背面・バックショット', 'クローズアップ（素材寄り）'],
+                pose: ['正面で立ち', '歩きながら横を向く', 'ポケットに手を入れる', 'スマホを見ている', '椅子に座る', 'バッグを持っている', 'ジャケットを肩にかける'],
+                scene: [...Object.keys(sceneDescriptions), 'スタジオ'],
+                lighting: ['自然光（日中）', '柔らかな逆光', '夕方のゴールデンアワー', 'スタジオ照明（影なし）', 'ドラマチックな影', '曇天（フラットな光）'],
+                camera: ['一眼レフ（背景ボケ）', '全身シャープに撮影', '広角レンズ（パース感）', 'フィルムカメラ風', '35mmポートレート', '真上からの俯瞰'],
+            };
 
-  // 状態管理
-  const [editableValues, setEditableValues] = useState({
-    modelGender: '男性',
-    modelEthnicity: '日本人',
-    modelAge: '20代前半',
-    modelType: '細身',
-    modelVibe: '清潔感・爽やか',
-    angle: '全身',
-    pose: '歩きながら横を向く',
-    scene: sceneDescriptions['都心の街並み'], 
-    lighting: '自然光（日中）',
-    camera: '一眼レフ（背景ボケ）',
-  });
+            const labels = {
+                modelGender: '性別',
+                modelEthnicity: '国籍・系統',
+                modelAge: '年齢層',
+                modelType: '体格',
+                modelVibe: '雰囲気',
+                angle: 'アングル',
+                pose: 'ポーズ',
+                scene: 'ロケーション（固定背景描写）',
+                lighting: 'ライティング',
+                camera: 'カメラ・画角'
+            };
 
-  const [isStudioOpen, setIsStudioOpen] = useState(false);
-  const [productInfo, setProductInfo] = useState('');
-  const [sizeInfo, setSizeInfo] = useState('');
-  const [coordinateInfo, setCoordinateInfo] = useState('');
-  const [refComments, setRefComments] = useState({
-    slot1: '',
-    slot2: '',
-    slot3: '',
-    slot4: ''
-  });
+            const [editableValues, setEditableValues] = useState({
+                modelGender: '男性',
+                modelEthnicity: '日本人',
+                modelAge: '20代前半',
+                modelType: '細身',
+                modelVibe: '清潔感・爽やか',
+                angle: '全身',
+                pose: '歩きながら横を向く',
+                scene: sceneDescriptions['都心の街並み'], 
+                lighting: '自然光（日中）',
+                camera: '一眼レフ（背景ボケ）',
+            });
 
-  const [generatedPrompt, setGeneratedPrompt] = useState('');
-  const [copied, setCopied] = useState(false);
-  
-  // プルダウン外クリック検知用のRef
-  const studioDropdownRef = useRef(null);
-
-  // 外側クリックでプルダウンを閉じる
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (studioDropdownRef.current && !studioDropdownRef.current.contains(event.target)) {
-        setIsStudioOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // チップをクリックした時の処理
-  const handleChipClick = (key, val) => {
-    if (key === 'scene') {
-      if (val === 'スタジオ') {
-        setIsStudioOpen(!isStudioOpen);
-      } else {
-        setIsStudioOpen(false);
-        setEditableValues(prev => ({ ...prev, [key]: sceneDescriptions[val] }));
-      }
-    } else {
-      setEditableValues(prev => ({ ...prev, [key]: val }));
-    }
-  };
-
-  // スタジオ詳細を選択した時
-  const handleStudioSelect = (variation) => {
-    setEditableValues(prev => ({ ...prev, scene: studioVariations[variation] }));
-    setIsStudioOpen(false);
-  };
-
-  const handleInputChange = (key, val) => {
-    setEditableValues(prev => ({ ...prev, [key]: val }));
-  };
-
-  const handleRefCommentChange = (slot, val) => {
-    setRefComments(prev => ({ ...prev, [slot]: val }));
-  };
-
-  // 現在選択されているスタジオ名を取得するヘルパー
-  const getSelectedStudioName = () => {
-    return Object.keys(studioVariations).find(key => studioVariations[key] === editableValues.scene);
-  };
-
-  // プロンプト生成ロジック
-  const generate = () => {
-    const displayProduct = productInfo.trim() || 'メインイメージに映っている商品の色、素材の質感、ディテールをそのまま維持する';
-    const displaySize = sizeInfo.trim() || 'メインイメージにある衣服の形状、丈感、シルエット、ボリューム感を忠実に再現し、過度な形状補正を行わない';
-    const displayCoord = coordinateInfo.trim() || 'メインイメージのスタイリングを尊重し、シンプルで調和の取れた構成にする';
-
-    const angleStyle = editableValues.angle === '全身（顔切り）' 
-      ? '全身のポートレートだが、首から上の顔部分はフレームアウト（カット）させ、商品とスタイルに焦点を当てること。'
-      : editableValues.angle;
-
-    const refLines = Object.entries(refComments)
-      .filter(([_, val]) => val.trim() !== '')
-      .map(([key, val]) => `${key.replace('slot', '参考画像')}: ${val}`);
-    
-    const displayRefs = refLines.length > 0 
-      ? `【参考画像への個別指示】\n${refLines.join('\n')}` 
-      : `【参考画像への指示】\nアップロードされた各参考画像から、ポーズ・顔立ち・背景のニュアンスを総合的に抽出し、現在の設定と矛盾しない形で反映する`;
-
-    const prompt = `LOOK写真構成：
-【アングル】${angleStyle}
-【モデル】${editableValues.modelAge}、${editableValues.modelType}な${editableValues.modelEthnicity}の${editableValues.modelGender}。${editableValues.modelVibe}な雰囲気。
-
-【商品詳細】
-${displayProduct}
-
-【サイズ感・シルエット】
-${displaySize}
-
-【コーディネート】
-${displayCoord}
-
-【ロケーション詳細】
-${editableValues.scene}
-
-【ライティング・動作】
-${editableValues.lighting}のなか、${editableValues.pose}。
-
-${displayRefs}
-
-【撮影クオリティ】
-${editableValues.camera}。高解像度、2K、フォトリアル、商用カタログ品質、衣類の質感を正確に描写。不自然なロゴや文字は含めない。メインイメージにある服の固有のキャラクターを損なわないこと。`;
-
-    setGeneratedPrompt(prompt);
-  };
-
-  useEffect(() => {
-    generate();
-  }, [editableValues, productInfo, sizeInfo, coordinateInfo, refComments]);
-
-  // コピー機能 (iFrame制限に対応した互換モード)
-  const copyToClipboard = () => {
-    try {
-      const textArea = document.createElement("textarea");
-      textArea.value = generatedPrompt;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-9999px";
-      textArea.style.top = "0";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      const successful = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      if (successful) {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }
-    } catch (err) {
-      console.error('Copy failed: ', err);
-    }
-  };
-
-  const getReferenceAdvice = () => {
-    return [
-      { id: 1, title: '構図・アングル', desc: `${editableValues.angle}で${editableValues.pose}の構図` },
-      { id: 2, title: 'モデル・顔立ち', desc: editableValues.angle === '全身（顔切り）' ? '首から下のスタイルのみ参考' : `${editableValues.modelEthnicity}${editableValues.modelGender}の見本` },
-      { id: 3, title: '背景・光', desc: '選択したロケーションのイメージ画像' },
-      { id: 4, title: 'スタイリング', desc: coordinateInfo ? '入力したコーデの参考画像' : '全体のバランス確認用画像' }
-    ];
-  };
-
-  const selectedStudio = getSelectedStudioName();
-
-  return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8 text-center border-b border-slate-200 pb-6">
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center justify-center gap-2">
-            <Sparkles className="text-blue-600" />
-            EC AI Prompt Master Pro
-          </h1>
-          <p className="text-slate-500 mt-2 text-sm font-medium italic">High Consistency Lookbook Generator</p>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          <div className="lg:col-span-7 space-y-6">
+            const [isStudioOpen, setIsStudioOpen] = useState(false);
+            const [productInfo, setProductInfo] = useState('');
+            const [sizeInfo, setSizeInfo] = useState('');
+            const [coordinateInfo, setCoordinateInfo] = useState('');
+            const [refComments, setRefComments] = useState({ slot1: '', slot2: '', slot3: '', slot4: '' });
+            const [generatedPrompt, setGeneratedPrompt] = useState('');
+            const [copied, setCopied] = useState(false);
             
-            {/* STEP 1: 商品・コーディネート情報 */}
-            <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-blue-50">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-3 text-slate-700">
-                <ShoppingBag className="w-5 h-5 text-blue-600" />
-                STEP 1: 商品・コーディネート情報
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">商品詳細（素材・カラー）</label>
-                  <textarea 
-                    className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all"
-                    placeholder="例：綿100% ヘビーウェイト、ホワイト..."
-                    value={productInfo}
-                    onChange={(e) => setProductInfo(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">サイズ・シルエット</label>
-                  <textarea 
-                    className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all"
-                    placeholder="未入力の場合、メインイメージの形状を100%尊重します"
-                    value={sizeInfo}
-                    onChange={(e) => setSizeInfo(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black text-blue-500 uppercase mb-1 block tracking-wider">コーディネートアイテム</label>
-                  <textarea 
-                    className="w-full h-24 p-3 bg-blue-50/20 border border-blue-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all"
-                    placeholder="例：黒のカーゴパンツ、白スニーカー..."
-                    value={coordinateInfo}
-                    onChange={(e) => setCoordinateInfo(e.target.value)}
-                  />
-                </div>
-              </div>
-            </section>
+            const studioDropdownRef = useRef(null);
 
-            {/* STEP 2: モデル & シーン */}
-            <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-bold mb-6 flex items-center gap-2 border-b pb-3 text-slate-700">
-                <Layout className="w-5 h-5 text-blue-500" />
-                STEP 2: モデル & シーン調整
-              </h2>
-              <div className="space-y-6">
-                {Object.entries(options).map(([key, vals]) => (
-                  <div key={key}>
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-[0.1em] mb-3 block">
-                      {labels[key]}
-                    </label>
-                    
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {vals.map(val => (
-                        <div key={val} className="relative" ref={val === 'スタジオ' ? studioDropdownRef : null}>
-                          <button
-                            onClick={() => handleChipClick(key, val)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
-                              (key === 'scene' && val === 'スタジオ' && (isStudioOpen || selectedStudio))
-                              ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-100'
-                              : (key === 'scene' && val !== 'スタジオ' && editableValues[key] === sceneDescriptions[val]) || (key !== 'scene' && editableValues[key] === val)
-                              ? 'bg-blue-600 text-white shadow-md' 
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }`}
-                          >
-                            {val === 'スタジオ' && selectedStudio ? `スタジオ: ${selectedStudio}` : val}
-                            {val === 'スタジオ' && <ChevronDown size={14} className={`transition-transform ${isStudioOpen ? 'rotate-180' : ''}`} />}
-                          </button>
-                          
-                          {/* スタジオ用プルダウン */}
-                          {val === 'スタジオ' && isStudioOpen && (
-                            <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-1">
-                              {Object.keys(studioVariations).map(variation => (
-                                <button
-                                  key={variation}
-                                  onClick={() => handleStudioSelect(variation)}
-                                  className={`w-full text-left px-3 py-2 rounded-lg text-[11px] transition-colors ${
-                                    selectedStudio === variation
-                                    ? 'bg-blue-50 text-blue-700 font-bold'
-                                    : 'hover:bg-slate-50 text-slate-600'
-                                  }`}
-                                >
-                                  {variation}
-                                </button>
-                              ))}
+            useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (studioDropdownRef.current && !studioDropdownRef.current.contains(event.target)) {
+                        setIsStudioOpen(false);
+                    }
+                };
+                document.addEventListener('mousedown', handleClickOutside);
+                return () => document.removeEventListener('mousedown', handleClickOutside);
+            }, []);
+
+            const handleChipClick = (key, val) => {
+                if (key === 'scene') {
+                    if (val === 'スタジオ') {
+                        setIsStudioOpen(!isStudioOpen);
+                    } else {
+                        setIsStudioOpen(false);
+                        setEditableValues(prev => ({ ...prev, [key]: sceneDescriptions[val] }));
+                    }
+                } else {
+                    setEditableValues(prev => ({ ...prev, [key]: val }));
+                }
+            };
+
+            const handleStudioSelect = (variation) => {
+                setEditableValues(prev => ({ ...prev, scene: studioVariations[variation] }));
+                setIsStudioOpen(false);
+            };
+
+            const handleInputChange = (key, val) => {
+                setEditableValues(prev => ({ ...prev, [key]: val }));
+            };
+
+            const handleRefCommentChange = (slot, val) => {
+                setRefComments(prev => ({ ...prev, [slot]: val }));
+            };
+
+            const getSelectedStudioName = () => {
+                return Object.keys(studioVariations).find(key => studioVariations[key] === editableValues.scene);
+            };
+
+            const generate = () => {
+                const displayProduct = productInfo.trim() || 'メインイメージに映っている商品の色、素材の質感、ディテールをそのまま維持する';
+                const displaySize = sizeInfo.trim() || 'メインイメージにある衣服の形状、丈感、シルエット、ボリューム感を忠実に再現し、過度な形状補正を行わない';
+                const displayCoord = coordinateInfo.trim() || 'メインイメージのスタイリングを尊重し、シンプルで調和の取れた構成にする';
+
+                const angleStyle = editableValues.angle === '全身（顔切り）' 
+                    ? '全身のポートレートだが、首から上の顔部分はフレームアウト（カット）させ、商品とスタイルに焦点を当てること。'
+                    : editableValues.angle;
+
+                const refLines = Object.entries(refComments)
+                    .filter(([_, val]) => val.trim() !== '')
+                    .map(([key, val]) => `${key.replace('slot', '参考画像')}: ${val}`);
+                
+                const displayRefs = refLines.length > 0 
+                    ? `【参考画像への個別指示】\n${refLines.join('\n')}` 
+                    : `【参考画像への指示】\nアップロードされた各参考画像から、ポーズ・顔立ち・背景のニュアンスを総合的に抽出し、現在の設定と矛盾しない形で反映する`;
+
+                const prompt = `LOOK写真構成：\n【アングル】${angleStyle}\n【モデル】${editableValues.modelAge}、${editableValues.modelType}な${editableValues.modelEthnicity}の${editableValues.modelGender}。${editableValues.modelVibe}な雰囲気。\n\n【商品詳細】\n${displayProduct}\n\n【サイズ感・シルエット】\n${displaySize}\n\n【コーディネート】\n${displayCoord}\n\n【ロケーション詳細】\n${editableValues.scene}\n\n【ライティング・動作】\n${editableValues.lighting}のなか、${editableValues.pose}。\n\n${displayRefs}\n\n【撮影クオリティ】\n${editableValues.camera}。高解像度、2K、フォトリアル、商用カタログ品質、衣類の質感を正確に描写。不自然なロゴや文字は含めない。メインイメージにある服の固有のキャラクターを損なわないこと。`;
+
+                setGeneratedPrompt(prompt);
+            };
+
+            useEffect(() => {
+                generate();
+            }, [editableValues, productInfo, sizeInfo, coordinateInfo, refComments]);
+
+            const copyToClipboard = () => {
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = generatedPrompt;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-9999px";
+                    textArea.style.top = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    if (successful) {
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                    }
+                } catch (err) {
+                    console.error('Copy failed: ', err);
+                }
+            };
+
+            const getReferenceAdvice = () => {
+                return [
+                    { id: 1, title: '構図・アングル', desc: `${editableValues.angle}で${editableValues.pose}の構図` },
+                    { id: 2, title: 'モデル・顔立ち', desc: editableValues.angle === '全身（顔切り）' ? '首から下のスタイルのみ参考' : `${editableValues.modelEthnicity}${editableValues.modelGender}の見本` },
+                    { id: 3, title: '背景・光', desc: '選択したロケーションのイメージ画像' },
+                    { id: 4, title: 'スタイリング', desc: coordinateInfo ? '入力したコーデの参考画像' : '全体のバランス確認用画像' }
+                ];
+            };
+
+            const selectedStudio = getSelectedStudioName();
+
+            return (
+                <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
+                    <div className="max-w-7xl mx-auto">
+                        <header className="mb-8 text-center border-b border-slate-200 pb-6">
+                            <h1 className="text-3xl font-bold text-slate-900 flex items-center justify-center gap-2">
+                                <Icon name="sparkles" size={32} className="text-blue-600" />
+                                EC AI Prompt Master Pro
+                            </h1>
+                            <p className="text-slate-500 mt-2 text-sm font-medium italic">High Consistency Lookbook Generator</p>
+                        </header>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="lg:col-span-7 space-y-6">
+                                <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-blue-50">
+                                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-3 text-slate-700">
+                                        <Icon name="shopping-bag" size={20} className="text-blue-600" />
+                                        STEP 1: 商品・コーディネート情報
+                                    </h2>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">商品詳細（素材・カラー）</label>
+                                            <textarea className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all" placeholder="例：綿100% ヘビーウェイト、ホワイト..." value={productInfo} onChange={(e) => setProductInfo(e.target.value)} />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">サイズ・シルエット</label>
+                                            <textarea className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all" placeholder="未入力の場合、メインイメージの形状を100%尊重します" value={sizeInfo} onChange={(e) => setSizeInfo(e.target.value)} />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black text-blue-500 uppercase mb-1 block tracking-wider">コーディネートアイテム</label>
+                                            <textarea className="w-full h-24 p-3 bg-blue-50/20 border border-blue-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all" placeholder="例：黒のカーゴパンツ、白スニーカー..." value={coordinateInfo} onChange={(e) => setCoordinateInfo(e.target.value)} />
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                    <h2 className="text-lg font-bold mb-6 flex items-center gap-2 border-b pb-3 text-slate-700">
+                                        <Icon name="layout" size={20} className="text-blue-500" />
+                                        STEP 2: モデル & シーン調整
+                                    </h2>
+                                    <div className="space-y-6">
+                                        {Object.entries(options).map(([key, vals]) => (
+                                            <div key={key}>
+                                                <label className="text-xs font-black text-slate-400 uppercase tracking-[0.1em] mb-3 block">{labels[key]}</label>
+                                                <div className="flex flex-wrap gap-2 mb-3">
+                                                    {vals.map(val => (
+                                                        <div key={val} className="relative" ref={val === 'スタジオ' ? studioDropdownRef : null}>
+                                                            <button onClick={() => handleChipClick(key, val)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${(key === 'scene' && val === 'スタジオ' && (isStudioOpen || selectedStudio)) ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-100' : (key === 'scene' && val !== 'スタジオ' && editableValues[key] === sceneDescriptions[val]) || (key !== 'scene' && editableValues[key] === val) ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                                                                {val === 'スタジオ' && selectedStudio ? `スタジオ: ${selectedStudio}` : val}
+                                                                {val === 'スタジオ' && <Icon name="chevron-down" size={14} className={`transition-transform ${isStudioOpen ? 'rotate-180' : ''}`} />}
+                                                            </button>
+                                                            {val === 'スタジオ' && isStudioOpen && (
+                                                                <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-1">
+                                                                    {Object.keys(studioVariations).map(variation => (
+                                                                        <button key={variation} onClick={() => handleStudioSelect(variation)} className={`w-full text-left px-3 py-2 rounded-lg text-[11px] transition-colors ${selectedStudio === variation ? 'bg-blue-50 text-blue-700 font-bold' : 'hover:bg-slate-50 text-slate-600'}`}>
+                                                                            {variation}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="relative">
+                                                    {key === 'scene' ? (
+                                                        <textarea className="w-full h-24 p-4 bg-orange-50/20 border border-orange-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-orange-400 transition-all" value={editableValues[key]} onChange={(e) => handleInputChange(key, e.target.value)} />
+                                                    ) : (
+                                                        <input type="text" className="w-full px-4 py-2 bg-blue-50/30 border border-blue-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 pr-10" value={editableValues[key]} onChange={(e) => handleInputChange(key, e.target.value)} />
+                                                    )}
+                                                    <Icon name="edit-3" size={14} className="absolute right-3 top-4 text-blue-300 pointer-events-none" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+
+                                <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-pink-50">
+                                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-3 text-slate-700">
+                                        <Icon name="list-checks" size={20} className="text-pink-500" />
+                                        STEP 3: 参考画像への個別指示（任意）
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {[1, 2, 3, 4].map(num => (
+                                            <div key={num}>
+                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">参考画像 {num} へのコメント</label>
+                                                <textarea className="w-full h-20 p-3 bg-pink-50/10 border border-pink-100 rounded-xl text-xs focus:ring-2 focus:ring-pink-400 transition-all" placeholder={`例：この画像のポーズを参考にして...`} value={refComments[`slot${num}`]} onChange={(e) => handleRefCommentChange(`slot${num}`, e.target.value)} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
                             </div>
-                          )}
+
+                            <div className="lg:col-span-5 space-y-6">
+                                <section className="bg-slate-900 text-slate-100 p-6 rounded-3xl shadow-2xl sticky top-8 border border-slate-700">
+                                    <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-4">
+                                        <div>
+                                            <h2 className="text-lg font-bold flex items-center gap-2 text-blue-400">
+                                                <Icon name="refresh-cw" size={20} />
+                                                コピー用 指示テキスト
+                                            </h2>
+                                            <div className="flex items-center gap-1.5 mt-1">
+                                                <Icon name="type" size={12} className="text-slate-500" />
+                                                <span className="text-[11px] font-bold text-slate-400">
+                                                    文字数: <span className={generatedPrompt.length > 1000 ? "text-orange-400" : "text-blue-400"}>{generatedPrompt.length}</span> 文字
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button onClick={copyToClipboard} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${copied ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-blue-600 hover:bg-blue-500 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(37,99,235,0.4)]'}`}>
+                                            <Icon name={copied ? "check-circle-2" : "copy"} size={16} />
+                                            {copied ? 'コピー成功' : 'コピーする'}
+                                        </button>
+                                    </div>
+                                    <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 min-h-[400px] whitespace-pre-wrap text-[12px] leading-relaxed font-mono text-slate-300">
+                                        {generatedPrompt}
+                                    </div>
+                                    <div className="mt-8 pt-6 border-t border-slate-800">
+                                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                            <Icon name="image" size={16} className="text-pink-500" />
+                                            推奨スロット構成
+                                        </h3>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {getReferenceAdvice().map((adv) => (
+                                                <div key={adv.id} className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/30">
+                                                    <div className="text-[9px] text-blue-400 font-bold mb-1 tracking-tighter">SLOT {adv.id}: {adv.title}</div>
+                                                    <div className="text-[11px] text-slate-300 leading-tight">{adv.desc}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
                         </div>
-                      ))}
+                        <footer className="mt-12 py-8 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-widest">
+                            AI Fashion Image Generator Logic v3.5 | HTML Export Version
+                        </footer>
                     </div>
-
-                    <div className="relative">
-                      {key === 'scene' ? (
-                        <textarea 
-                          className="w-full h-24 p-4 bg-orange-50/20 border border-orange-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-orange-400 transition-all"
-                          value={editableValues[key]}
-                          onChange={(e) => handleInputChange(key, e.target.value)}
-                        />
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-full px-4 py-2 bg-blue-50/30 border border-blue-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 pr-10"
-                          value={editableValues[key]}
-                          onChange={(e) => handleInputChange(key, e.target.value)}
-                        />
-                      )}
-                      <Edit3 size={14} className="absolute right-3 top-4 text-blue-300 pointer-events-none" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* STEP 3: 参考画像 */}
-            <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-pink-50">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-3 text-slate-700">
-                <ListChecks className="w-5 h-5 text-pink-500" />
-                STEP 3: 参考画像への個別指示（任意）
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1, 2, 3, 4].map(num => (
-                  <div key={num}>
-                    <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">参考画像 {num} へのコメント</label>
-                    <textarea 
-                      className="w-full h-20 p-3 bg-pink-50/10 border border-pink-100 rounded-xl text-xs focus:ring-2 focus:ring-pink-400 transition-all"
-                      placeholder={`例：この画像のポーズを参考にして...`}
-                      value={refComments[`slot${num}`]}
-                      onChange={(e) => handleRefCommentChange(`slot${num}`, e.target.value)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          {/* 右カラム: コピー用 指示テキスト */}
-          <div className="lg:col-span-5 space-y-6">
-            <section className="bg-slate-900 text-slate-100 p-6 rounded-3xl shadow-2xl sticky top-8 border border-slate-700">
-              <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-4">
-                <div>
-                  <h2 className="text-lg font-bold flex items-center gap-2 text-blue-400">
-                    <RefreshCw className="w-5 h-5" />
-                    コピー用 指示テキスト
-                  </h2>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <Type size={12} className="text-slate-500" />
-                    <span className="text-[11px] font-bold text-slate-400">
-                      文字数: <span className={generatedPrompt.length > 1000 ? "text-orange-400" : "text-blue-400"}>{generatedPrompt.length}</span> 文字
-                    </span>
-                  </div>
                 </div>
-                <button 
-                  onClick={copyToClipboard}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                    copied ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-blue-600 hover:bg-blue-500 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                  }`}
-                >
-                  {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
-                  {copied ? 'コピー成功' : 'コピーする'}
-                </button>
-              </div>
-              
-              <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 min-h-[400px] whitespace-pre-wrap text-[12px] leading-relaxed font-mono text-slate-300">
-                {generatedPrompt}
-              </div>
+            );
+        };
 
-              <div className="mt-8 pt-6 border-t border-slate-800">
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4 text-pink-500" />
-                  推奨スロット構成
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {getReferenceAdvice().map((adv) => (
-                    <div key={adv.id} className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/30">
-                      <div className="text-[9px] text-blue-400 font-bold mb-1 tracking-tighter">SLOT {adv.id}: {adv.title}</div>
-                      <div className="text-[11px] text-slate-300 leading-tight">{adv.desc}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <footer className="mt-12 py-8 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-widest">
-          AI Fashion Image Generator Logic v3.5 | Studio UI & UX Enhanced
-        </footer>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
