@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EC AI Prompt Master Pro</title>
+    <title>モデル撮影プロンプター</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM CDN -->
@@ -240,12 +240,16 @@
             return (
                 <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
                     <div className="max-w-7xl mx-auto">
-                        <header className="mb-8 text-center border-b border-slate-200 pb-6">
-                            <h1 className="text-3xl font-black text-slate-900 flex items-center justify-center gap-3">
-                                <Icon name="sparkles" size={32} className="text-[#18ABA0]" />
-                                EC AI Prompt Master Pro
+                        <header className="mb-10 text-center border-b border-slate-200 pb-8">
+                            <h1 className="text-4xl font-black text-slate-900 flex items-center justify-center gap-3">
+                                <Icon name="sparkles" size={40} className="text-[#18ABA0]" />
+                                モデル撮影プロンプター
                             </h1>
-                            <p className="text-slate-500 mt-2 text-sm font-bold italic tracking-wide">High Consistency Lookbook Generator</p>
+                            <p className="text-slate-500 mt-4 text-sm font-bold leading-relaxed max-w-2xl mx-auto text-center">
+                                モデル着用画像を作成するためのサポートツールです。<br />
+                                必要事項を選択・入力することで指示テキストをまとめて作成してくれます。<br />
+                                ファッションスタジオ/ウェアデザインラボを使う際にご利用ください。
+                            </p>
                         </header>
 
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -374,7 +378,6 @@
                                             <Icon name={copied ? "check-circle-2" : "copy"} size={16} /> {copied ? 'コピー成功' : 'コピーする'}
                                         </button>
                                     </div>
-                                    {/* 全表示UIへの修正: min-hを維持しつつ、内容に合わせて自動で伸びる設定 */}
                                     <textarea 
                                         ref={promptTextareaRef}
                                         className="w-full bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 text-[12px] leading-relaxed font-bold font-mono text-slate-300 focus:ring-2 focus:ring-[#18ABA0] focus:outline-none transition-all resize-none overflow-hidden"
@@ -421,7 +424,7 @@
                         )}
 
                         <footer className="mt-12 py-8 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold">
-                            AI Fashion Image Generator Logic v4.4 | Auto-resize Textarea UI
+                            モデル撮影プロンプター | ver：2.1.0
                         </footer>
                     </div>
                 </div>
