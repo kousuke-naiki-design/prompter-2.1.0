@@ -16,6 +16,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        /* Custom Key Color Overrides */
+        .theme-text { color: #18ABA0; }
+        .theme-bg { background-color: #18ABA0; }
+        .theme-border { border-color: #18ABA0; }
+        .theme-ring { --tw-ring-color: #18ABA0; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -24,7 +29,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         
-        // Lucideアイコンのラッパーコンポーネント
+        // Lucide Icon Wrapper Component
         const Icon = ({ name, size = 16, className = "" }) => {
             const iconRef = useRef(null);
             useEffect(() => {
@@ -192,15 +197,6 @@
                 }
             };
 
-            const getReferenceAdvice = () => {
-                return [
-                    { id: 1, title: '構図・アングル', desc: `${editableValues.angle}で${editableValues.pose}の構図` },
-                    { id: 2, title: 'モデル・顔立ち', desc: editableValues.angle === '全身（顔切り）' ? '首から下のスタイルのみ参考' : `${editableValues.modelEthnicity}${editableValues.modelGender}の見本` },
-                    { id: 3, title: '背景・光', desc: '選択したロケーションのイメージ画像' },
-                    { id: 4, title: 'スタイリング', desc: coordinateInfo ? '入力したコーデの参考画像' : '全体のバランス確認用画像' }
-                ];
-            };
-
             const selectedStudio = getSelectedStudioName();
 
             return (
@@ -208,7 +204,7 @@
                     <div className="max-w-7xl mx-auto">
                         <header className="mb-8 text-center border-b border-slate-200 pb-6">
                             <h1 className="text-3xl font-bold text-slate-900 flex items-center justify-center gap-2">
-                                <Icon name="sparkles" size={32} className="text-blue-600" />
+                                <Icon name="sparkles" size={32} className="text-[#18ABA0]" />
                                 EC AI Prompt Master Pro
                             </h1>
                             <p className="text-slate-500 mt-2 text-sm font-medium italic">High Consistency Lookbook Generator</p>
@@ -216,30 +212,32 @@
 
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                             <div className="lg:col-span-7 space-y-6">
-                                <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-blue-50">
+                                {/* STEP 1: 基本情報 */}
+                                <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-[#18ABA0]/10">
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-3 text-slate-700">
-                                        <Icon name="shopping-bag" size={20} className="text-blue-600" />
+                                        <Icon name="shopping-bag" size={20} className="text-[#18ABA0]" />
                                         STEP 1: 商品・コーディネート情報
                                     </h2>
                                     <div className="space-y-4">
                                         <div>
                                             <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">商品詳細（素材・カラー）</label>
-                                            <textarea className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all" placeholder="例：綿100% ヘビーウェイト、ホワイト..." value={productInfo} onChange={(e) => setProductInfo(e.target.value)} />
+                                            <textarea className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#18ABA0] focus:outline-none transition-all" placeholder="例：綿100% ヘビーウェイト、ホワイト..." value={productInfo} onChange={(e) => setProductInfo(e.target.value)} />
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">サイズ・シルエット</label>
-                                            <textarea className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all" placeholder="未入力の場合、メインイメージの形状を100%尊重します" value={sizeInfo} onChange={(e) => setSizeInfo(e.target.value)} />
+                                            <textarea className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#18ABA0] focus:outline-none transition-all" placeholder="未入力の場合、メインイメージの形状を100%尊重します" value={sizeInfo} onChange={(e) => setSizeInfo(e.target.value)} />
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-blue-500 uppercase mb-1 block tracking-wider">コーディネートアイテム</label>
-                                            <textarea className="w-full h-24 p-3 bg-blue-50/20 border border-blue-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all" placeholder="例：黒のカーゴパンツ、白スニーカー..." value={coordinateInfo} onChange={(e) => setCoordinateInfo(e.target.value)} />
+                                            <label className="text-[10px] font-black text-[#18ABA0] uppercase mb-1 block tracking-wider">コーディネートアイテム</label>
+                                            <textarea className="w-full h-24 p-3 bg-[#18ABA0]/5 border border-[#18ABA0]/20 rounded-xl text-sm focus:ring-2 focus:ring-[#18ABA0] focus:outline-none transition-all" placeholder="例：黒のカーゴパンツ、白スニーカー..." value={coordinateInfo} onChange={(e) => setCoordinateInfo(e.target.value)} />
                                         </div>
                                     </div>
                                 </section>
 
+                                {/* STEP 2: モデル & シーン */}
                                 <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                                     <h2 className="text-lg font-bold mb-6 flex items-center gap-2 border-b pb-3 text-slate-700">
-                                        <Icon name="layout" size={20} className="text-blue-500" />
+                                        <Icon name="layout" size={20} className="text-[#18ABA0]" />
                                         STEP 2: モデル & シーン調整
                                     </h2>
                                     <div className="space-y-6">
@@ -249,14 +247,14 @@
                                                 <div className="flex flex-wrap gap-2 mb-3">
                                                     {vals.map(val => (
                                                         <div key={val} className="relative" ref={val === 'スタジオ' ? studioDropdownRef : null}>
-                                                            <button onClick={() => handleChipClick(key, val)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${(key === 'scene' && val === 'スタジオ' && (isStudioOpen || selectedStudio)) ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-100' : (key === 'scene' && val !== 'スタジオ' && editableValues[key] === sceneDescriptions[val]) || (key !== 'scene' && editableValues[key] === val) ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                                                            <button onClick={() => handleChipClick(key, val)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${(key === 'scene' && val === 'スタジオ' && (isStudioOpen || selectedStudio)) ? 'bg-[#18ABA0] text-white shadow-md ring-2 ring-[#18ABA0]/20' : (key === 'scene' && val !== 'スタジオ' && editableValues[key] === sceneDescriptions[val]) || (key !== 'scene' && editableValues[key] === val) ? 'bg-[#18ABA0] text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
                                                                 {val === 'スタジオ' && selectedStudio ? `スタジオ: ${selectedStudio}` : val}
                                                                 {val === 'スタジオ' && <Icon name="chevron-down" size={14} className={`transition-transform ${isStudioOpen ? 'rotate-180' : ''}`} />}
                                                             </button>
                                                             {val === 'スタジオ' && isStudioOpen && (
                                                                 <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-1">
                                                                     {Object.keys(studioVariations).map(variation => (
-                                                                        <button key={variation} onClick={() => handleStudioSelect(variation)} className={`w-full text-left px-3 py-2 rounded-lg text-[11px] transition-colors ${selectedStudio === variation ? 'bg-blue-50 text-blue-700 font-bold' : 'hover:bg-slate-50 text-slate-600'}`}>
+                                                                        <button key={variation} onClick={() => handleStudioSelect(variation)} className={`w-full text-left px-3 py-2 rounded-lg text-[11px] transition-colors ${selectedStudio === variation ? 'bg-[#18ABA0]/10 text-[#18ABA0] font-bold' : 'hover:bg-slate-50 text-slate-600'}`}>
                                                                             {variation}
                                                                         </button>
                                                                     ))}
@@ -267,27 +265,28 @@
                                                 </div>
                                                 <div className="relative">
                                                     {key === 'scene' ? (
-                                                        <textarea className="w-full h-24 p-4 bg-orange-50/20 border border-orange-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-orange-400 transition-all" value={editableValues[key]} onChange={(e) => handleInputChange(key, e.target.value)} />
+                                                        <textarea className="w-full h-24 p-4 bg-[#18ABA0]/5 border border-[#18ABA0]/10 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[#18ABA0] focus:outline-none transition-all" value={editableValues[key]} onChange={(e) => handleInputChange(key, e.target.value)} />
                                                     ) : (
-                                                        <input type="text" className="w-full px-4 py-2 bg-blue-50/30 border border-blue-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 pr-10" value={editableValues[key]} onChange={(e) => handleInputChange(key, e.target.value)} />
+                                                        <input type="text" className="w-full px-4 py-2 bg-slate-100/50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[#18ABA0] focus:outline-none pr-10" value={editableValues[key]} onChange={(e) => handleInputChange(key, e.target.value)} />
                                                     )}
-                                                    <Icon name="edit-3" size={14} className="absolute right-3 top-4 text-blue-300 pointer-events-none" />
+                                                    <Icon name="edit-3" size={14} className="absolute right-3 top-4 theme-text opacity-50 pointer-events-none" />
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 </section>
 
-                                <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-pink-50">
+                                {/* STEP 3: 参考画像 */}
+                                <section className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100">
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-3 text-slate-700">
-                                        <Icon name="list-checks" size={20} className="text-pink-500" />
+                                        <Icon name="list-checks" size={20} className="text-slate-400" />
                                         STEP 3: 参考画像への個別指示（任意）
                                     </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {[1, 2, 3, 4].map(num => (
                                             <div key={num}>
                                                 <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block tracking-wider">参考画像 {num} へのコメント</label>
-                                                <textarea className="w-full h-20 p-3 bg-pink-50/10 border border-pink-100 rounded-xl text-xs focus:ring-2 focus:ring-pink-400 transition-all" placeholder={`例：この画像のポーズを参考にして...`} value={refComments[`slot${num}`]} onChange={(e) => handleRefCommentChange(`slot${num}`, e.target.value)} />
+                                                <textarea className="w-full h-20 p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs focus:ring-2 focus:ring-[#18ABA0] focus:outline-none transition-all" placeholder={`例：この画像のポーズを参考にして...`} value={refComments[`slot${num}`]} onChange={(e) => handleRefCommentChange(`slot${num}`, e.target.value)} />
                                             </div>
                                         ))}
                                     </div>
@@ -298,18 +297,18 @@
                                 <section className="bg-slate-900 text-slate-100 p-6 rounded-3xl shadow-2xl sticky top-8 border border-slate-700">
                                     <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-4">
                                         <div>
-                                            <h2 className="text-lg font-bold flex items-center gap-2 text-blue-400">
+                                            <h2 className="text-lg font-bold flex items-center gap-2 text-[#18ABA0]">
                                                 <Icon name="refresh-cw" size={20} />
                                                 コピー用 指示テキスト
                                             </h2>
                                             <div className="flex items-center gap-1.5 mt-1">
                                                 <Icon name="type" size={12} className="text-slate-500" />
                                                 <span className="text-[11px] font-bold text-slate-400">
-                                                    文字数: <span className={generatedPrompt.length > 1000 ? "text-orange-400" : "text-blue-400"}>{generatedPrompt.length}</span> 文字
+                                                    文字数: <span className={generatedPrompt.length > 1000 ? "text-orange-400" : "text-[#18ABA0]"}>{generatedPrompt.length}</span> 文字
                                                 </span>
                                             </div>
                                         </div>
-                                        <button onClick={copyToClipboard} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${copied ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-blue-600 hover:bg-blue-500 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(37,99,235,0.4)]'}`}>
+                                        <button onClick={copyToClipboard} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${copied ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-[#18ABA0] hover:bg-[#18ABA0]/80 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(24,171,160,0.4)]'}`}>
                                             <Icon name={copied ? "check-circle-2" : "copy"} size={16} />
                                             {copied ? 'コピー成功' : 'コピーする'}
                                         </button>
@@ -317,25 +316,11 @@
                                     <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 min-h-[400px] whitespace-pre-wrap text-[12px] leading-relaxed font-mono text-slate-300">
                                         {generatedPrompt}
                                     </div>
-                                    <div className="mt-8 pt-6 border-t border-slate-800">
-                                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                            <Icon name="image" size={16} className="text-pink-500" />
-                                            推奨スロット構成
-                                        </h3>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {getReferenceAdvice().map((adv) => (
-                                                <div key={adv.id} className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/30">
-                                                    <div className="text-[9px] text-blue-400 font-bold mb-1 tracking-tighter">SLOT {adv.id}: {adv.title}</div>
-                                                    <div className="text-[11px] text-slate-300 leading-tight">{adv.desc}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
                                 </section>
                             </div>
                         </div>
                         <footer className="mt-12 py-8 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-widest">
-                            AI Fashion Image Generator Logic v3.5 | HTML Export Version
+                            AI Fashion Image Generator Logic v3.6 | Key Color Updated
                         </footer>
                     </div>
                 </div>
