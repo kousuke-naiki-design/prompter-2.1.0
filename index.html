@@ -90,7 +90,7 @@
             { id: 'back', label: '背面ショット', desc: '背後からのショット。後ろ姿にフォーカス。' },
             { id: 'diagonal', label: '斜め45度', desc: '斜め前から捉えた立体感のあるショット。' },
             { id: 'detail', label: '素材寄り(クローズアップ)', desc: '衣服の素材感、縫製、質感が伝わる至近距離。' },
-            { id: 'dynamic', label: '動きのあるショット', desc: '振り返る瞬間や裾がなびくなど、動的なニュアンス。' }
+            { id: 'dynamic', label: '動きのあるショット', desc: '振り返る瞬間や裾がなびくなど, 動的なニュアンス。' }
         ];
 
         const Icon = ({ name, size = 16, className = "" }) => {
@@ -234,7 +234,7 @@
             };
 
             const generateVariation = (angleObj) => {
-                const prompt = `別アングル展開指示：\n【重要】直前に生成したメインイメージの「同一人物」「同一の衣服」「同一の背景環境」を厳密に維持してください。キャラクターの一貫性を最優先すること。\n\n【新しいカメラアングル】\n${angleObj.label}：${angleObj.desc}\n\n【撮影継続のポイント】\n衣服のシワ感やシルエットを保ったまま、カメラ位置のみを移動させて撮影してください。質感、色味、ライティングの条件はすべてメイン写真に従うこと。`;
+                const prompt = `別アングル展開指示：\n【重要】直前に生成したメインイメージの「同一人物」「同一の衣服」「同一の背景環境」を厳密に維持してください。キャラクターの一貫性（Character Consistency）を最優先すること。\n\n【新しいカメラアングル】\n${angleObj.label}：${angleObj.desc}\n\n【撮影継続のポイント】\n衣服のシワ感やシルエットを保ったまま、カメラ位置のみを移動させて撮影してください。質感、色味、ライティングの条件はすべてメイン写真に従うこと。`;
                 setVariationPrompt(prompt);
                 setTimeout(() => { 
                     const section = document.getElementById('variation-section');
@@ -488,7 +488,7 @@
                         )}
 
                         <footer className="mt-24 py-12 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold">
-                            モデル撮影プロンプター | ver：2.1.0
+                            モデル撮影プロンプター | ver.2.2.0
                         </footer>
                     </div>
                 </div>
