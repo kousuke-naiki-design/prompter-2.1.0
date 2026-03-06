@@ -63,7 +63,10 @@
             '自然豊かな公園': '手入れの行き届いた芝生が広がる開放的な公園。背景には深い緑の落葉樹の森。小道はベージュの砂利。穏やかで明るい自然光に包まれた場所。',
             'モダンなオフィス': 'ミニマルでモダンなオフィス空間。背景には黒いスチールフレームのガラスパーティションが整然と並び、空間に奥行きと構造的な美しさを与えている。',
             'ホテルのロビー': '高い天井と大理石の床が煌びやかな高級ホテルのロビー。暖色の間接照明と、ベルベット素材の重厚なソファ。',
-            'ビーチ・リゾート': '白い砂浜とクリスタルブルーの穏やかな海。背景には数本のヤシの木。色彩豊かで開放感溢れるロケーション。'
+            'ビーチ・リゾート': '白い砂浜とクリスタルブルーの穏やかな海。背景には数本のヤシの木。色彩豊かで開放感溢れるロケーション。',
+            'キッズルーム': 'カラフルなおもちゃや絵本が並ぶ、明るくポップなキッズルーム。柔らかいパステルカラーの壁紙と、安全なプレイマットの床。',
+            '明るいリビング': '大きな窓から自然光が差し込む、温かみのあるファミリー向けのリビングルーム。木目の美しいフローリングと、肌触りの良いラグマット。',
+            '公園の芝生広場': '太陽の光が降り注ぐ、緑豊かな公園の広場。奥にはカラフルな遊具が少し見え、子供が元気に遊べる開放的な空間。'
         };
 
         const studioVariations = {
@@ -89,12 +92,22 @@
                 '両手をポケットに入れ、少し肩をすくめて歩き出す動作', 
                 '親指だけをポケットに引っ掛け、ラフで動きのある構え', 
                 'ポケットに手を入れながら、斜め後ろを振り返る動作'
+            ],
+            'キッズ・ベビー': [
+                '無邪気に走る・跳ねる動作',
+                'おもちゃを持って嬉しそうにする',
+                'しゃがんで地面の何かを見つめる',
+                '元気よく両手を広げてジャンプ',
+                'ちょこんと床に座り込む（お座り）',
+                'ニコニコ笑いながらハイハイする（ベビー）',
+                '親と手を繋いで歩く',
+                'カメラに向かって手を振る'
             ]
         };
 
         const variationAngles = [
             { id: 'side', label: '真横のアングル', desc: 'モデルの真横からのショット。シルエットを際立たせる構成。' },
-            { id: 'back', label: '背面ショット', desc: '背後からのショット。後ろ姿にフォーカス。' },
+            { id: 'back', label: '背面ショット', desc: 'モデルの背後からのショット。後ろ姿にフォーカス。' },
             { id: 'diagonal', label: '斜め45度', desc: '斜め前から捉えた立体感のあるショット。' },
             { id: 'detail', label: '素材寄り(クローズアップ)', desc: '衣服の素材感、縫製、質感が伝わる超至近距離のショット。' },
             { id: 'dynamic', label: '動きのあるショット', desc: '振り返る瞬間や裾がなびくなど、動的なニュアンスを加えたショット。' }
@@ -108,11 +121,11 @@
 
         const App = () => {
             const options = {
-                modelGender: ['男性', '女性', 'ノンバイナリー'],
+                modelGender: ['男性', '女性', 'ノンバイナリー', '男の子', '女の子'],
                 modelEthnicity: ['日本人', '韓国人系統', '欧米人', 'ハーフ（アジア×欧米）', 'アフリカ系', '南アジア系'],
-                modelAge: ['10代後半', '20代前半', '20代後半', '30代', '40代', '50代以上'],
-                modelType: ['細身', '標準', '筋肉質', 'プラスサイズ', '小柄', '高身長'],
-                modelVibe: ['清潔感・爽やか', 'クール・モード', 'ストリート・無骨', '親しみやすい', 'ラグジュアリー', 'スポーティ', 'ヴィンテージ風'],
+                modelAge: ['ベビー（0〜2歳）', 'キッズ（3〜6歳）', 'キッズ（7〜12歳）', '10代後半', '20代前半', '20代後半', '30代', '40代', '50代以上'],
+                modelType: ['細身', '標準', '筋肉質', 'プラスサイズ', '小柄', '高身長', 'ぽっちゃり（ベビー・キッズ）'],
+                modelVibe: ['清潔感・爽やか', 'キュート・愛らしい', '元気いっぱい', 'クール・モード', 'ストリート・無骨', '親しみやすい', 'ラグジュアリー', 'スポーティ', 'ヴィンテージ風'],
                 angle: ['全身', '全身（顔切り）', '上半身（バストアップ）', '膝上（ニーアップ）', '足元・下半身のみ', '背面・バックショット', 'クローズアップ（素材寄り）'],
                 lighting: ['自然光（日中）', '柔らかな逆光', '夕方のゴールデンアワー', 'スタジオ照明（影なし）', 'ドラマチックな影', '曇天（フラットな光）'],
                 camera: ['一眼レフ（背景ボケ）', '全身シャープに撮影', '広角レンズ（パース感）', 'フィルムカメラ風', '35mmポートレート', '真上からの俯瞰'],
@@ -149,6 +162,7 @@
             const dropdownRefs = {
                 poseStand: useRef(null),
                 posePocket: useRef(null),
+                poseKids: useRef(null),
                 sceneStudio: useRef(null)
             };
             const promptTextareaRef = useRef(null);
@@ -158,9 +172,10 @@
 
             useEffect(() => {
                 const handleClickOutside = (event) => {
-                    if (dropdownRefs.poseStand.current && !dropdownRefs.poseStand.current.contains(event.target) &&
-                        dropdownRefs.posePocket.current && !dropdownRefs.posePocket.current.contains(event.target) &&
-                        dropdownRefs.sceneStudio.current && !dropdownRefs.sceneStudio.current.contains(event.target)) {
+                    if ((dropdownRefs.poseStand.current && !dropdownRefs.poseStand.current.contains(event.target)) &&
+                        (dropdownRefs.posePocket.current && !dropdownRefs.posePocket.current.contains(event.target)) &&
+                        (dropdownRefs.poseKids.current && !dropdownRefs.poseKids.current.contains(event.target)) &&
+                        (dropdownRefs.sceneStudio.current && !dropdownRefs.sceneStudio.current.contains(event.target))) {
                         setOpenDropdown(null);
                     }
                 };
@@ -274,6 +289,11 @@
                 return "ロケーションを選択";
             };
 
+            // キッズポーズが選択されているか判定する関数
+            const isKidsPoseSelected = () => {
+                return poseVariations['キッズ・ベビー'].some(p => editableValues.pose.includes(p.substring(0, 5)));
+            };
+
             return (
                 <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
                     <div className="max-w-7xl mx-auto">
@@ -320,6 +340,7 @@
                                         STEP 2: モデル & シーン調整
                                     </h2>
                                     <div className="space-y-8">
+                                        {/* 一般項目チップ & フリー入力 */}
                                         {Object.entries(options).map(([key, vals]) => (
                                             <div key={key}>
                                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.1em] mb-3 block">{labels[key]}</label>
@@ -328,7 +349,7 @@
                                                         <button key={val} onClick={() => handleChipClick(key, val)} className={`px-3 py-2 rounded-lg text-[11px] font-bold transition-all ${editableValues[key] === val ? 'bg-[#18ABA0] text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{val}</button>
                                                     ))}
                                                 </div>
-                                                <input type="text" className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-[#18ABA0] focus:outline-none" value={editableValues[key]} onChange={(e) => setEditableValues(p => ({...p, [key]: e.target.value}))} placeholder={`${labels[key]}の詳細を直接入力・編集...`} />
+                                                <input type="text" className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-[#18ABA0] focus:outline-none" value={editableValues[key]} onChange={(e) => setEditableValues(p => ({...p, [key]: e.target.value}))} placeholder={`${labels[key]}の詳細を入力・編集...`} />
                                                 
                                                 {key === 'modelType' && (
                                                     <div className="mt-4 animate-in fade-in slide-in-from-top-1">
@@ -366,6 +387,14 @@
                                                     {openDropdown === 'pose-pocket' && (
                                                         <div className="absolute z-50 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-2xl p-1 modal-animate overflow-y-auto max-h-[350px]">
                                                             {poseVariations['ポケット'].map(p => <button key={p} onClick={() => { setEditableValues(v => ({...v, pose: p})); setOpenDropdown(null); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-[11px] font-bold ${editableValues.pose === p ? 'bg-[#18ABA0]/10 text-[#18ABA0]' : 'hover:bg-slate-50'}`}>{p}</button>)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="relative" ref={dropdownRefs.poseKids}>
+                                                    <button onClick={() => setOpenDropdown(openDropdown === 'pose-kids' ? null : 'pose-kids')} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-bold transition-all ${isKidsPoseSelected() ? 'bg-[#18ABA0] text-white shadow-md ring-2 ring-[#18ABA0]/20' : 'bg-slate-100 text-slate-600'}`}>キッズ・ベビー <Icon name="chevron-down" size={14} /></button>
+                                                    {openDropdown === 'pose-kids' && (
+                                                        <div className="absolute z-50 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-2xl p-1 modal-animate overflow-y-auto max-h-[350px]">
+                                                            {poseVariations['キッズ・ベビー'].map(p => <button key={p} onClick={() => { setEditableValues(v => ({...v, pose: p})); setOpenDropdown(null); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-[11px] font-bold ${editableValues.pose === p ? 'bg-[#18ABA0]/10 text-[#18ABA0]' : 'hover:bg-slate-50'}`}>{p}</button>)}
                                                         </div>
                                                     )}
                                                 </div>
@@ -498,7 +527,7 @@
                         )}
 
                         <footer className="mt-24 py-12 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold">
-                            モデル撮影プロンプター | ver.2.3.0
+                            モデル撮影プロンプター | ver.2.4.0
                         </footer>
                     </div>
                 </div>
