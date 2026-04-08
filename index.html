@@ -105,12 +105,24 @@
             ]
         };
 
-        const variationAngles = [
-            { id: 'side', label: '真横のアングル', desc: 'モデルの真横からのショット。シルエットを際立たせる構成。' },
-            { id: 'back', label: '背面ショット', desc: 'モデルの背後からのショット。後ろ姿にフォーカス。' },
-            { id: 'diagonal', label: '斜め45度', desc: '斜め前から捉えた立体感のあるショット。' },
-            { id: 'detail', label: '素材寄り(クローズアップ)', desc: '衣服の素材感、縫製、質感が伝わる超至近距離のショット。' },
-            { id: 'dynamic', label: '動きのあるショット', desc: '振り返る瞬間や裾がなびくなど、動的なニュアンスを加えたショット。' }
+        const variationCategories = [
+            {
+                title: 'アングル変更（カメラ位置の移動）',
+                items: [
+                    { id: 'side', label: '真横のアングル', desc: 'モデルの体の向きは変えず、カメラを真横に移動させたショット。' },
+                    { id: 'back', label: '背面ショット', desc: 'モデルの体の向きは変えず、カメラを背後に移動させたショット。' },
+                    { id: 'diagonal', label: '斜め45度', desc: 'モデルの体の向きやポーズは変えず、カメラ位置だけを真正面から斜め45度に移動させたショット。' },
+                    { id: 'dynamic', label: '動きのあるショット', desc: '振り返る瞬間や裾がなびくなど、動的なニュアンスを加えたショット。' }
+                ]
+            },
+            {
+                title: 'ズーム調整（寄り・引きの変更）',
+                items: [
+                    { id: 'zoom-out', label: '引きの画像にする（全身化）', desc: '現在の寄り画像からカメラを引き、足元まで全身を写します。' },
+                    { id: 'zoom-in-upper', label: '上半身に寄る（ズームイン）', desc: '現在の全身・引き画像から、顔〜上半身にフォーカスします。' },
+                    { id: 'zoom-in-lower', label: '下半身に寄る（ズームイン）', desc: '現在の全身・引き画像から、腰〜足元にフォーカスします。' }
+                ]
+            }
         ];
 
         const Icon = ({ name, size = 16, className = "" }) => {
@@ -260,7 +272,25 @@
             };
 
             const generateVariation = (angleObj) => {
-                const prompt = `別アングル展開指示：\n【重要】直前に生成したメインイメージの「同一人物」「同一の衣服」「同一の背景環境」を厳密に維持してください。キャラクターの一貫性を最優先すること。\n\n【新しいカメラアングル】\n${angleObj.label}：${angleObj.desc}\n\n【撮影継続のポイント】\n衣服のシワ感やシルエットを保ったまま、カメラ位置のみを移動させて撮影してください。質感、色味、ライティングの条件はすべてメイン写真に従うこと。`;
+                let instruction = '';
+                let point = '';
+
+                if (angleObj.id === 'zoom-out') {
+                    instruction = `【構図の変更：全身化（ズームアウト）】\n現在の寄り（アップ）の構図からカメラを引き、モデルの頭から足先、靴までがすべて収まる「全身のアングル」に変更してください。`;
+                    point = 'モデルのポーズや衣服のデザインは保ったまま、カメラ位置を遠ざけて全身を捉えること。';
+                } else if (angleObj.id === 'zoom-in-upper') {
+                    instruction = `【構図の変更：上半身への寄り（ズームイン）】\n現在の全身・引きの構図からカメラを寄せ、モデルの「上半身（バストアップ〜ウェストアップ）」にフォーカスしたアングルに変更してください。`;
+                    point = '衣服のシワ感や質感は保ったまま、カメラ位置を近づけてトップスのディテールや表情を強調すること。';
+                } else if (angleObj.id === 'zoom-in-lower') {
+                    instruction = `【構図の変更：下半身への寄り（ズームイン）】\n現在の全身・引きの構図からカメラを寄せ、モデルの「下半身（ウェストから足元、または膝周り）」にフォーカスしたアングルに変更してください。顔はフレームアウトさせて構いません。`;
+                    point = '衣服のシワ感や質感は保ったまま、カメラ位置を近づけてボトムスや靴のディテールを強調すること。';
+                } else {
+                    instruction = `【新しいカメラアングル】\n${angleObj.label}：${angleObj.desc}`;
+                    point = '衣服のシワ感やシルエット、モデルのポーズ自体は保ったまま、カメラ位置のみを移動させて撮影してください。モデルを回転させるのではなく、カメラの視点を変更すること。質感、色味、ライティングの条件はすべてメイン写真に従うこと。';
+                }
+
+                const prompt = `別アングル・構図展開指示：\n【重要】直前に生成したメインイメージの「同一人物」「同一の衣服」「同一の背景環境」を厳密に維持してください。キャラクターの一貫性を最優先すること。\n\n${instruction}\n\n【撮影継続のポイント】\n${point}`;
+                
                 setVariationPrompt(prompt);
                 setTimeout(() => { 
                     const section = document.getElementById('variation-section');
@@ -496,14 +526,21 @@
 
                         {/* 別アングル展開ツール */}
                         <div id="variation-section" className="mt-20 pt-20 border-t-4 border-slate-200">
-                            <h2 className="text-3xl font-black text-slate-900 mb-10 text-center flex items-center justify-center gap-3"><Icon name="camera" size={32} className="text-pink-500" /> 別アングル展開ツール</h2>
+                            <h2 className="text-3xl font-black text-slate-900 mb-10 text-center flex items-center justify-center gap-3"><Icon name="camera" size={32} className="text-pink-500" /> 別アングル・構図展開ツール</h2>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-                                <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-3">
-                                    {variationAngles.map(a => (
-                                        <button key={a.id} onClick={() => generateVariation(a)} className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-transparent hover:border-pink-200 hover:bg-pink-50 transition-all text-left group">
-                                            <div><div className="text-sm font-black text-slate-800 group-hover:text-pink-600 transition-colors">{a.label}</div><div className="text-[11px] text-slate-500 font-bold">{a.desc}</div></div>
-                                            <Icon name="plus-circle" size={20} className="text-slate-300 group-hover:text-pink-500 transition-colors" />
-                                        </button>
+                                <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-3 max-h-[600px] overflow-y-auto">
+                                    {variationCategories.map((category, catIdx) => (
+                                        <div key={catIdx} className={catIdx > 0 ? "mt-6" : ""}>
+                                            <div className="text-[10px] font-black text-pink-500 uppercase tracking-widest mb-3 pl-1">{category.title}</div>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                {category.items.map(a => (
+                                                    <button key={a.id} onClick={() => generateVariation(a)} className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-transparent hover:border-pink-200 hover:bg-pink-50 transition-all text-left group">
+                                                        <div><div className="text-sm font-black text-slate-800 group-hover:text-pink-600 transition-colors">{a.label}</div><div className="text-[11px] text-slate-500 font-bold">{a.desc}</div></div>
+                                                        <Icon name="plus-circle" size={20} className="text-slate-300 group-hover:text-pink-500 transition-colors" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                                 <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl border border-slate-700">
@@ -527,7 +564,7 @@
                         )}
 
                         <footer className="mt-24 py-12 border-t border-slate-200 text-center text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold">
-                            モデル撮影プロンプター | ver.2.4.0
+                            モデル撮影プロンプター | ver.2.5.0
                         </footer>
                     </div>
                 </div>
